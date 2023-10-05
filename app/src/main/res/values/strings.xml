@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Levinson</string>
+    <string name="Password">Şifreniz</string>
+    <string name="Entery">Giriş Yap</string>
+    <string name="RememberMe">Beni Hatırla</string>
+    <string name="mainpage">Anasayfa</string>
+    <string name="countingList">Sayım Listesi</string>
+    <string name="CountingDetail">Sayim Detay</string>
+    <string name="AntennaPower">Anten Gücü</string>
+    <string name="SofwareVersion">Yazılım Versiyonu :</string>
+    <string name="FirmwareVersion">Aygıt Sürümü :</string>
+    <string name="SerialNumber">Seri Numarası</string>
+    <string name="Region">Bölge</string>
+    <string name="Frequence">Frekans</string>
+    <string name="BasebandSpeed">Anaband Hızı</string>
+    <string name="session">Session</string>
+    <string name="Qvalue">Q değeri\n</string>
+    <string name="Save">Kaydet</string>
+    <string name="factoryreset">FactoryReset</string>
+    <string name="scan_key_warning">RFID aramak için tetiğe basınız</string>
+
+</resources>

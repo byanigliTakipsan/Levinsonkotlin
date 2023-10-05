@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".HomeScreenActivity">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <!-- Toolbar -->
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/ThemeOverlay.Material3.Toolbar.Surface">
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Levinson"
+                    android:textColor="#fff"
+                    android:textSize="20sp" />
+            </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.AppBarLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/pageLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/mainpage"
+            style="@style/TextAppearance.AppCompat.Display1"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pageLabel"
+            app:layout_constraintEnd_toStartOf="@id/fMain_btnSevkiyat"
+            android:layout_marginTop="16dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:padding="24dp"
+            android:layout_margin="16dp"
+            android:drawableTop="@drawable/ic_sayim"
+            android:background="@drawable/btn_1"
+            android:textColor="#3e4050"
+            android:textAllCaps="false"
+            android:textSize="16dp"
+            android:gravity="bottom|center"
+            android:text="\nSayım"
+            android:id="@+id/fMain_btnSayim" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            app:layout_constraintStart_toEndOf="@id/fMain_btnSayim"
+            app:layout_constraintTop_toBottomOf="@id/pageLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:padding="24dp"
+            android:layout_margin="16dp"
+            android:drawableTop="@drawable/ic_sevkiyat"
+            android:background="@drawable/fragm_main_btn2"
+            android:textColor="#3e4050"
+            android:textAllCaps="false"
+            android:textSize="16dp"
+            android:gravity="bottom|center"
+            android:text="Sevkiyat ve\nMal Kabul"
+            android:id="@+id/fMain_btnSevkiyat"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fMain_btnSayim"
+            app:layout_constraintEnd_toStartOf="@id/fMain_btnCihazAyarlari"
+            android:layout_marginTop="16dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:padding="24dp"
+            android:layout_margin="16dp"
+            android:drawableTop="@drawable/ic_find"
+            android:background="@drawable/fragm_main_btn3"
+            android:textColor="#3e4050"
+            android:textAllCaps="false"
+            android:textSize="16dp"
+            android:gravity="bottom|center"
+            android:text="\nÜrün Bul"
+            android:id="@+id/fMain_btnUrunBul" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            app:layout_constraintStart_toEndOf="@id/fMain_btnUrunBul"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fMain_btnSevkiyat"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:padding="24dp"
+            android:layout_margin="16dp"
+            android:drawableTop="@drawable/ic_ayar"
+            android:background="@drawable/fragm_main_btn5"
+            android:textColor="#3e4050"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:gravity="bottom|center"
+            android:text="\nAyarlar"
+            android:id="@+id/fMain_btnCihazAyarlari" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
