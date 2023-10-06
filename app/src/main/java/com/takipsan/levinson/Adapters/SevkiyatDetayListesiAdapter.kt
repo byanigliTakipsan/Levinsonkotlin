@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.takipsan.levinson.Entities.Retrofit.Response.ConsigmentEpc
-import com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc
 import com.takipsan.levinson.R
 
 class SevkiyatDetayListesiAdapter(

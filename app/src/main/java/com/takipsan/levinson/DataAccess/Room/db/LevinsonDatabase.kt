@@ -7,9 +7,10 @@ import androidx.room.RoomDatabase
 import com.takipsan.levinson.DataAccess.Room.dao.ConsigmentDao
 import com.takipsan.levinson.DataAccess.Room.dao.ConsigmentEpcDao
 import com.takipsan.levinson.Entities.Room.Consignment
+import com.takipsan.levinson.Entities.Room.CountingKor
 import com.takipsan.levinson.Entities.Room.cosignmentEpcs
 
-@Database(entities = [Consignment::class, cosignmentEpcs::class], version = 5, exportSchema = false)
+@Database(entities = [Consignment::class, cosignmentEpcs::class,CountingKor::class], version = 6, exportSchema = false)
 abstract  class LevinsonDatabase:RoomDatabase() {
     abstract fun ConsigmentDao():ConsigmentDao
     abstract fun ConsigmentEpcDao():ConsigmentEpcDao

@@ -13,30 +13,23 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.pda.rfid.EPCModel
 import com.pda.rfid.IAsynchronousMessage
 import com.pda.rfid.uhf.UHFReader
 import com.port.Adapt
-import com.takipsan.levinson.Adapters.SayimDetayListesiAdapter
 import com.takipsan.levinson.Adapters.SevkiyatDetayListesiAdapter
-import com.takipsan.levinson.Adapters.SevkiyatListesiAdapter
 import com.takipsan.levinson.Entities.Retrofit.Request.ConsignmentEpc
-import com.takipsan.levinson.Entities.Retrofit.Resource
-import com.takipsan.levinson.Entities.Retrofit.Response.ApiResponseBase
-import com.takipsan.levinson.Entities.Retrofit.Response.SevkiyatListesi
+import com.takipsan.levinson.Entities.Retrofit.Request.SevkiyatEpcGonderme_Kor
+import com.takipsan.levinson.Entities.Retrofit.Response.ConsigmentEpc
 import com.takipsan.levinson.Entities.Retrofit.Status
-import com.takipsan.levinson.Entities.Room.Consignment
-import com.takipsan.levinson.databinding.ActivitySevkiyatBinding
+import com.takipsan.levinson.Entities.Room.cosignmentEpcs
 import com.takipsan.levinson.databinding.ActivitySevkiyatDetayBinding
 import com.takipsan.levinson.viewModel.ConsigmentViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
+class SevkiyatDetay : AppCompatActivity(), IAsynchronousMessage {
     private lateinit var binding: ActivitySevkiyatDetayBinding
     private val viewModel: ConsigmentViewModel by viewModels()
     private lateinit var progressDialog: ProgressDialog
@@ -50,7 +43,8 @@ class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
     private var Sname = ""
     private var Smode = 0
     private var type = 0
-
+    private var myEpcList = arrayListOf<ConsigmentEpc>()
+    private lateinit var adapter: SevkiyatDetayListesiAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,14 +62,36 @@ class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
         progressDialog = ProgressDialog(this)
         progressDialog.setMessage("Yükleniyor...") // Yükleme mesajı
         progressDialog.setCancelable(false) // Kullanıcının geri tuşuna basarak kapatmasını engelliyor.
+        adapter = SevkiyatDetayListesiAdapter(this, myEpcList)
+        binding.sayimDetayLvSayimEpcListesi.adapter = adapter
+
+        binding.sayimDetayBtnSenkronizeEt.setOnClickListener {
+            val s = viewModel.consigmentEpcDao.getUnrecoded(Sid.toLong())
+            val mapFromArrayList = s.mapIndexed { index, value -> index.toString() to value.epc }.toMap()
+            viewModel.setSevkiyatKor(this, SevkiyatEpcGonderme_Kor(
+                userId = UserData.UserID.toLong(),
+                consignmentId = Sid.toLong(),
+                epc = mapFromArrayList
+            ))
+        }
 
         viewModel.epcList.observe(this) {
             if (it.status == Status.LOADING) {
                 showLoading();
             } else if (it.status == Status.SUCCESS) {
                 hideLoading()
+                myEpcList.addAll(it.data!!.data as ArrayList<ConsigmentEpc>)
+                //forlocalda
+                viewModel.consigmentEpcDao.getRecordBySevkiyatid(Sid.toLong())?.let {
+                    it.forEach { st ->
+                        if (!myEpcList.any { it.epc == st.epc }) {
+                            myEpcList.add(ConsigmentEpc(st.epc, st.found))
+                        }
+                    }
+                }
+                binding.sayimDetayLblOkunanAdet.text = myEpcList.size.toString()
+                adapter.notifyDataSetChanged()
 
-                viewModel.setFirstCommon(Sid.toLong())
             } else if (it.status == Status.NOINTERNET) {
                 hideLoading()
                 MaterialAlertDialogBuilder(this)
@@ -112,10 +128,56 @@ class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
 
         }
 
-        viewModel.commonSayımListesi.observe(this) {
-            val adapter = SevkiyatDetayListesiAdapter(this, it)
-            binding.sayimDetayLvSayimEpcListesi.adapter = adapter
+
+        viewModel.SaveepcList.observe(this) {
+            if (it.status == Status.LOADING) {
+                showLoading();
+            } else if (it.status == Status.SUCCESS) {
+                hideLoading()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Uyarı")
+                    .setMessage("Senkronize Edil")
+                    .setPositiveButton("Tamam", null)
+                    .show()
+
+            } else if (it.status == Status.NOINTERNET) {
+                hideLoading()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Uyarı")
+                    .setMessage("Cihaz bağlı değil!")
+                    .setPositiveButton("Tamam", null)
+                    .show()
+            } else if (it.status == Status.FORBIDDEN) {
+                hideLoading()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Uyarı")
+                    .setMessage("Oturum süresi doldu veya bir başkası tarafından oturumunuz açıldı")
+                    .setPositiveButton("Tamam") { dialog, which ->
+                        runOnUiThread {
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish()
+                        }
+                    }
+                    .show()
+
+            } else {
+                hideLoading()
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("API HATASI")
+                    .setMessage("Lütfen Takipsan ile iletişime geçiniz")
+                    .setPositiveButton("Tamam") { dialog, _ ->
+                        // Tamam butonuna basıldığında yapılacak işlemler buraya gelir.
+                        dialog.dismiss()
+                    }
+
+                    .show()
+            }
+
         }
+
     }
 
     override fun onStart() {
@@ -153,19 +215,42 @@ class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
             Log.d(TAG, "open UHF failed!")
             // TODO failed opened UHF
         }
-        // Set base band auto mode, q=1, session=1, flag = 0 flagA
-        UHFReader._Config.SetEPCBaseBandParam(255, 0, 0, 0)
-        // set ant 1 power to 20dBm
-        UHFReader._Config.SetANTPowerParam(1, 30)
+
     }
 
 
-
     override fun OutPutEPC(p0: EPCModel?) {
+        runOnUiThread {
+            if (p0 != null) {
+                if (type == 0) {
+                    //Kör SAYIM
+                    if (!myEpcList.any { it -> it.epc == p0._EPC }) {
+                        myEpcList.add(ConsigmentEpc(p0._EPC, 1))
+                        adapter.notifyDataSetChanged()
+                        if (viewModel.consigmentEpcDao.getRecordByEpcWithID(p0._EPC, Sid) == null) {
+                            viewModel.consigmentEpcDao.insert(
+                                cosignmentEpcs(
+                                    counting_id = Sid.toLong(),
+                                    epc = p0._EPC,
+                                    isTransfferd = 0,
+                                    found = 1,
+                                    created_at = UserData.UserID.toString(),
+                                    updated_user_id = UserData.UserID,
+                                    created_user_id = UserData.UserID,
 
-        if (p0 != null) {
-            viewModel.setNewItem(p0._EPC,Sid.toLong())
+                                    )
+                            )
+                        }
+
+                        binding.sayimDetayLblOkunanAdet.text = myEpcList.size.toString()
+
+                    }
+                }
+
+
+            }
         }
+
     }
 
 
@@ -177,7 +262,7 @@ class SevkiyatDetay : AppCompatActivity() ,IAsynchronousMessage{
             return
         }
         // start reading 6C tags using ant 1 in cycle continuous reading mode
-        isReading = UHFReader._Tag6C.GetEPC(1,1) == 0
+        isReading = UHFReader._Tag6C.GetEPC(1, 1) == 0
     }
 
     fun onStop(v: View?) {

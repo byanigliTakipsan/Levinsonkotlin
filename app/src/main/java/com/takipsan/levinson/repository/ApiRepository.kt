@@ -5,6 +5,7 @@ import com.takipsan.levinson.Entities.Retrofit.Request.ConsignmentEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.Login
 import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme_Kor
+import com.takipsan.levinson.Entities.Retrofit.Request.SevkiyatEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.UrunArama
 import com.takipsan.levinson.Entities.Retrofit.Response.ApiResponseBase
 import com.takipsan.levinson.Entities.Retrofit.Response.SayimListesi
@@ -53,5 +54,12 @@ class ApiRepository @Inject constructor(private val apiService: ApiService) {
         consigment: ConsignmentEpc
     ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.ConsigmentEpc>>> {
         return apiService.consignmentEpcList(auth, consigment)
+    }
+
+    suspend fun setConsigmentEpcList(
+        auth: String,
+        epc: SevkiyatEpcGonderme_Kor
+    ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.ConsigmentEpc>>> {
+        return apiService.SetconsignmentBlind(auth, epc)
     }
 }

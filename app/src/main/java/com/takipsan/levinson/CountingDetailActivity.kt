@@ -104,8 +104,11 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
             if (it.status == Status.LOADING) {
                 showLoading();
             } else if (it.status == Status.SUCCESS) {
+
+                //  LİSTELİ SAYIM && AMA LİSTESİ BOŞ
                 if (mode == 1 && it.data!!.data.isEmpty()) {
                     isReading = false;
+                    // OKUMA TÜRÜ FARK ETMEZ
                 } else if (mode == 1 || mode == 0) {
                     isReading = true;
                     if (it.data!!.data != null) {
@@ -293,11 +296,6 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
 
     override fun OutPutEPC(p0: EPCModel?) {
         if (p0 != null) {
-            Log.d(
-                TAG, " EPC: " + p0._EPC
-                        + " TID: " + p0._TID
-                        + " UserData:" + p0._UserData
-            )
             if (isReading) {
                 addEpcFromReader(p0._EPC)
             }
@@ -371,6 +369,9 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
                             // UI işlemleri burada yapılır
                             val result = withContext(Dispatchers.Default) {
                                 runOnUiThread {
+                                    try {
+
+
                                     list[index].found = 1
                                     val toneGenerator =
                                         ToneGenerator(AudioManager.STREAM_MUSIC, 100)
@@ -381,6 +382,10 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
                                     binding.sayimDetayLblKalanAdet.text =
                                         (list.count() - list.count { it -> it.found == 1 }).toString()
                                     yeniItemlist.add(list[index])
+                                    }catch (ex:Exception)
+                                    {
+                                        print(ex.stackTrace)
+                                    }
                                 }
                             }
 

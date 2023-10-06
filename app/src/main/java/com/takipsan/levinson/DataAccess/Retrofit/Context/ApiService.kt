@@ -4,6 +4,7 @@ import com.takipsan.levinson.Entities.Retrofit.Request.ConsignmentEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.Login
 import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme_Kor
+import com.takipsan.levinson.Entities.Retrofit.Request.SevkiyatEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.UrunArama
 import com.takipsan.levinson.Entities.Retrofit.Response.ApiResponseBase
 import com.takipsan.levinson.Entities.Retrofit.Response.ConsigmentEpc
@@ -66,5 +67,13 @@ interface ApiService {
         authorizationHeader: String,
         @Body
         body:ConsignmentEpc
+    ): Response<ApiResponseBase<List<ConsigmentEpc>>>
+
+    @POST("consignment/blind")
+    suspend fun SetconsignmentBlind(
+        @Header("Authorization")
+        authorizationHeader: String,
+        @Body
+        body:SevkiyatEpcGonderme_Kor
     ): Response<ApiResponseBase<List<ConsigmentEpc>>>
 }
