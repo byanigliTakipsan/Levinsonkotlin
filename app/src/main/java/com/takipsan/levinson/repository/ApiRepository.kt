@@ -4,6 +4,7 @@ import com.takipsan.levinson.DataAccess.Retrofit.Context.ApiService
 import com.takipsan.levinson.Entities.Retrofit.Request.ConsignmentEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.Login
+import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme
 import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.SevkiyatEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.UrunArama
@@ -40,6 +41,13 @@ class ApiRepository @Inject constructor(private val apiService: ApiService) {
         countingEpc: SayimEpcGonderme_Kor
     ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc>>> {
         return apiService.setCountingEpcBlink(auth, countingEpc)
+    }
+
+    suspend fun setCountingEpc(
+        auth: String,
+        countingEpc: SayimEpcGonderme
+    ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc>>> {
+        return apiService.setCountingEpc(auth, countingEpc)
     }
 
     suspend fun getUrunArama(

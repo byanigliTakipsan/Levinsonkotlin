@@ -12,8 +12,8 @@ import com.takipsan.levinson.Entities.Room.cosignmentEpcs
 @Dao
 interface ConsigmentEpcDao {
 
-    @Query("SELECT * FROM cosignmentEpcs WHERE epc = :epc and counting_id = :sid")
-    fun getRecordByEpcWithID(epc: String,sid:Int): cosignmentEpcs?
+    @Query("SELECT * FROM cosignmentEpcs WHERE epc = :epc and counting_id = :countingid")
+    fun getRecordByEpcWithID(epc: String,countingid:Long): cosignmentEpcs?
 
     @Query("SELECT * FROM cosignmentEpcs WHERE counting_id = :id")
     fun getRecordBySevkiyatid(id: Long): List<cosignmentEpcs>?

@@ -8,8 +8,9 @@ import androidx.room.PrimaryKey
 data class CountingKor(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val userID: Long,
+    val userID: Long =0,
     val consignmentID: Long,
-    val epcs:String,
-    val isTransffered:Int
+    val epcs:String = "",
+    val isTransffered:Int,
+    val isSeen:Int
 )

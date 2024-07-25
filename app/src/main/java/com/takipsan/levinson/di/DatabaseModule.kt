@@ -28,4 +28,8 @@ object DatabaseModule {
     @Provides
     fun providesConsigmentEpcDao(novaDatabase: LevinsonDatabase) = novaDatabase.ConsigmentEpcDao()
 
+    @Singleton
+    @Provides
+    fun providesCountingBlinkDao(novaDatabase: LevinsonDatabase) = novaDatabase.CountingBlinkDao()
+
 }

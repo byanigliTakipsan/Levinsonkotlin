@@ -25,6 +25,7 @@ import com.takipsan.levinson.Adapters.SayimDetayListesiAdapter
 import com.takipsan.levinson.Adapters.SayimListesiAdapter
 import com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
 import com.takipsan.levinson.Entities.Retrofit.Status
+import com.takipsan.levinson.Entities.Room.CountingKor
 import com.takipsan.levinson.databinding.ActivityCountingDetailBinding
 import com.takipsan.levinson.viewModel.CountingViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,9 +63,7 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
             // TODO failed opened UHF
         }
         // Set base band auto mode, q=1, session=1, flag = 0 flagA
-        UHFReader._Config.SetEPCBaseBandParam(255, 0, 1, 0)
-        // set ant 1 power to 20dBm
-        UHFReader._Config.SetANTPowerParam(1, 30)
+
     }
 
     private fun checkPermission() {
@@ -115,6 +114,7 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
                         it.data!!.data.forEach {
                             if (!list.any { ls -> ls.epc == it.epc }) {
                                 list.add(it)
+
                             }
                         }
                         runOnUiThread {
@@ -124,6 +124,7 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
                     }
 
                 }
+                Log.d("UOI Count",   list.count().toString())
                 // EŞEKLİK YAP BURAK
                 if (mode == 1) {
                     binding.sayimDetayLblOkunanAdet.text =
@@ -156,8 +157,9 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
         binding.sayimDetayBtnSenkronizeEt.setOnClickListener {
             if (yeniItemlist.any()) {
                 if (mode == 0) {
-                    viewModel.setCountingEpc_bilink(this,yeniItemlist, countingID.toLong())
+                    viewModel.setCountingEpc_bilink(this, yeniItemlist, countingID.toLong())
                 } else {
+                    viewModel.setCountingEpc(this, yeniItemlist, countingID.toLong())
 
                 }
 
@@ -231,7 +233,7 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
         val req = com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc(
             this.countingID
         )
-        viewModel.getCountingEpcs(this,req);
+        viewModel.getCountingEpcs(this, req);
     }
 
     fun onRead(v: View?) {
@@ -318,89 +320,99 @@ class CountingDetailActivity : AppCompatActivity(), IAsynchronousMessage {
         try {
 
 
-        if (mode == 0) {
-            synchronized(list) {
-                if (!list.any { it -> it.epc == epc }) {
+            if (mode == 0) {
+                synchronized(list) {
+                    if (!list.any { it -> it.epc == epc }) {
 
-                    mainScope.launch {
-                        try {
-                            // UI işlemleri burada yapılır
-                            val result = withContext(Dispatchers.Main) {
-                                runOnUiThread {
-                                    list.add(
-                                        com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc(
-                                            epc,
-                                            1
+                        mainScope.launch {
+                            try {
+                                // UI işlemleri burada yapılır
+                                val result = withContext(Dispatchers.Main) {
+                                    runOnUiThread {
+                                        list.add(
+                                            com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc(
+                                                epc,
+                                                1
+                                            )
                                         )
-                                    )
-                                    val toneGenerator =
-                                        ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-                                    toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
-                                    adapter.notifyDataSetChanged()
-                                    binding.sayimDetayLblOkunanAdet.text =
-                                        list.count().toString()
-                                    binding.sayimDetayLblKalanAdet.text =
-                                        list.count().toString()
-                                    yeniItemlist.add(
-                                        com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc(
-                                            epc,
-                                            1
+                                        val toneGenerator =
+                                            ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                                        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+                                        adapter.notifyDataSetChanged()
+                                        binding.sayimDetayLblOkunanAdet.text =
+                                            list.count().toString()
+                                        binding.sayimDetayLblKalanAdet.text =
+                                            list.count().toString()
+                                        yeniItemlist.add(
+                                            com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc(
+                                                epc,
+                                                1
+                                            )
                                         )
-                                    )
-                                }
-                            }
-
-
-                        } catch (e: Exception) {
-                            // Hata yönetimi
-                            Log.e("UOI", e.message.toString())
-                        }
-                    }
-                }
-            }
-        } else if (mode == 1) {
-            synchronized(list) {
-
-
-                val index = list.indexOfFirst { it -> it.epc == epc && it.found == 0 }
-                if (index >= 0) {
-                    mainScope.launch {
-                        try {
-                            // UI işlemleri burada yapılır
-                            val result = withContext(Dispatchers.Default) {
-                                runOnUiThread {
-                                    try {
-
-
-                                    list[index].found = 1
-                                    val toneGenerator =
-                                        ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-                                    toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
-                                    adapter.notifyDataSetChanged()
-                                    binding.sayimDetayLblOkunanAdet.text =
-                                        list.count { it -> it.found == 1 }.toString()
-                                    binding.sayimDetayLblKalanAdet.text =
-                                        (list.count() - list.count { it -> it.found == 1 }).toString()
-                                    yeniItemlist.add(list[index])
-                                    }catch (ex:Exception)
-                                    {
-                                        print(ex.stackTrace)
                                     }
                                 }
+
+
+                            } catch (e: Exception) {
+                                // Hata yönetimi
+                                Log.e("UOI", e.message.toString())
                             }
-
-
-                        } catch (e: Exception) {
-                            // Hata yönetimi
-                            Log.e("UOI", e.message.toString())
                         }
                     }
                 }
-            }
+            } else if (mode == 1) {
+                synchronized(list) {
 
-        }
-        }catch (ex:Exception){
-            Log.d("tag",ex.message.toString())
+
+                    val index = list.indexOfFirst { it -> it.epc == epc}
+                    if (index >= 0 && list[index].found == 0) {
+                        mainScope.launch {
+                            try {
+                                // UI işlemleri burada yapılır
+                                val result = withContext(Dispatchers.Default) {
+                                   runOnUiThread{
+                                       try {
+                                           val toneGenerator =
+                                               ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                                           toneGenerator.startTone(
+                                               ToneGenerator.TONE_PROP_BEEP,
+                                               150
+                                           )
+                                       }catch (e:Exception){
+
+                                       }
+
+                                   }
+
+                                    runOnUiThread {
+
+                                        try {
+
+                                            list[index].found = 1
+                                            yeniItemlist.add(list[index])
+                                            adapter.notifyDataSetChanged()
+                                            binding.sayimDetayLblOkunanAdet.text =
+                                                list.count { it -> it.found == 1 }.toString()
+                                            binding.sayimDetayLblKalanAdet.text =
+                                                (list.count() - list.count { it -> it.found == 1 }).toString()
+                                        } catch (ex: Exception) {
+
+                                        }
+                                    }
+                                }
+
+
+                            } catch (e: Exception) {
+                                // Hata yönetimi
+                                Log.e("UOI", e.message.toString())
+                            }
+                        }
+                    }
+                }
+
+            }
+        } catch (ex: Exception) {
+            Log.d("tag", ex.message.toString())
         }
     }
 

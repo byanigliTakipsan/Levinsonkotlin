@@ -227,7 +227,7 @@ class SevkiyatDetay : AppCompatActivity(), IAsynchronousMessage {
                     if (!myEpcList.any { it -> it.epc == p0._EPC }) {
                         myEpcList.add(ConsigmentEpc(p0._EPC, 1))
                         adapter.notifyDataSetChanged()
-                        if (viewModel.consigmentEpcDao.getRecordByEpcWithID(p0._EPC, Sid) == null) {
+                        if (viewModel.consigmentEpcDao.getRecordByEpcWithID(p0._EPC, Sid.toLong()) == null) {
                             viewModel.consigmentEpcDao.insert(
                                 cosignmentEpcs(
                                     counting_id = Sid.toLong(),
@@ -237,7 +237,6 @@ class SevkiyatDetay : AppCompatActivity(), IAsynchronousMessage {
                                     created_at = UserData.UserID.toString(),
                                     updated_user_id = UserData.UserID,
                                     created_user_id = UserData.UserID,
-
                                     )
                             )
                         }

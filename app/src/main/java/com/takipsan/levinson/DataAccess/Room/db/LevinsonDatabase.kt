@@ -6,14 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.takipsan.levinson.DataAccess.Room.dao.ConsigmentDao
 import com.takipsan.levinson.DataAccess.Room.dao.ConsigmentEpcDao
+import com.takipsan.levinson.DataAccess.Room.dao.CountingBlinkDao
 import com.takipsan.levinson.Entities.Room.Consignment
 import com.takipsan.levinson.Entities.Room.CountingKor
 import com.takipsan.levinson.Entities.Room.cosignmentEpcs
 
-@Database(entities = [Consignment::class, cosignmentEpcs::class,CountingKor::class], version = 6, exportSchema = false)
+@Database(entities = [Consignment::class, cosignmentEpcs::class,CountingKor::class], version = 8, exportSchema = false)
 abstract  class LevinsonDatabase:RoomDatabase() {
     abstract fun ConsigmentDao():ConsigmentDao
     abstract fun ConsigmentEpcDao():ConsigmentEpcDao
+
+    abstract fun CountingBlinkDao():CountingBlinkDao
 
     companion object {
         var INSTANCE: LevinsonDatabase? = null
@@ -25,7 +28,7 @@ abstract  class LevinsonDatabase:RoomDatabase() {
                         LevinsonDatabase::class.java,
                         "levinson.db"
                     ).createFromAsset("levinson.db")
-
+                        .fallbackToDestructiveMigration()
                         .allowMainThreadQueries().build()
                 }
             }

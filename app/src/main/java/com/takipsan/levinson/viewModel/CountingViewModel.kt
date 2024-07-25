@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.takipsan.levinson.DataAccess.Room.dao.CountingBlinkDao
+import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme
 import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Resource
 import com.takipsan.levinson.Entities.Retrofit.Response.ApiResponseBase
@@ -20,7 +22,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CountingViewModel @Inject constructor(private val apiRepository: ApiRepository) :
+class CountingViewModel @Inject constructor(
+    private val apiRepository: ApiRepository,
+    public val daoOfcountingBlink: CountingBlinkDao
+) :
     ViewModel() {
 
     private val _countingList = MutableLiveData<Resource<ApiResponseBase<List<SayimListesi>>>>()
@@ -45,18 +50,18 @@ class CountingViewModel @Inject constructor(private val apiRepository: ApiReposi
                     _countingList.postValue(Resource.forbidden(null))
                 }
             }
-        }else{
+        } else {
             _countingList.postValue(Resource.noInternet(null))
         }
     }
 
-    fun setCountingEpc_bilink(context:Context,list: ArrayList<CountingEpc>, sayimID: Long) {
+    fun setCountingEpc_bilink(context: Context, list: ArrayList<CountingEpc>, sayimID: Long) {
         val req: SayimEpcGonderme_Kor = SayimEpcGonderme_Kor(
             userId = UserData.UserID,
             countingId = sayimID,
             epc = list.mapIndexed { index, value -> index.toString() to value.epc }.toMap()
         )
-        if (NetworkManager.isOnline(context)){
+        if (NetworkManager.isOnline(context)) {
             _setBlinkEpc.postValue(Resource.loading(null))
             viewModelScope.launch(Dispatchers.IO) {
                 val response = apiRepository.setCountingEpcBlink(UserData.bearer!!, req)
@@ -73,7 +78,33 @@ class CountingViewModel @Inject constructor(private val apiRepository: ApiReposi
 
     }
 
-    fun getCountingEpcs(context: Context,req: com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc) {
+    fun setCountingEpc(context: Context, list: ArrayList<CountingEpc>, sayimID: Long) {
+        val req: SayimEpcGonderme = SayimEpcGonderme(
+            userId = UserData.UserID,
+            countingId = sayimID,
+            epc = list.mapIndexed { index, value -> index.toString() to value.epc }.toMap()
+        )
+        if (NetworkManager.isOnline(context)) {
+            _setBlinkEpc.postValue(Resource.loading(null))
+            viewModelScope.launch(Dispatchers.IO) {
+                val response = apiRepository.setCountingEpc(UserData.bearer!!, req)
+                if (response.code() == 200) {
+                    _setBlinkEpc.postValue(Resource.success(response.body()))
+                } else if (response.code() == 204) {
+                    _setBlinkEpc.postValue(Resource.nocontent(null))
+                } else {
+                    _setBlinkEpc.postValue(Resource.forbidden(null))
+                }
+
+            }
+        }
+
+    }
+
+    fun getCountingEpcs(
+        context: Context,
+        req: com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
+    ) {
         _countingEpc.postValue(Resource.loading(null))
         viewModelScope.launch(Dispatchers.IO) {
             val response = apiRepository.getCountingEpcList(UserData.bearer!!, req)
@@ -86,5 +117,6 @@ class CountingViewModel @Inject constructor(private val apiRepository: ApiReposi
             }
         }
     }
+
 
 }

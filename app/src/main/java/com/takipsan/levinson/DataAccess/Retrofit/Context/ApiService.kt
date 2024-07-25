@@ -3,6 +3,7 @@ package com.takipsan.levinson.DataAccess.Retrofit.Context
 import com.takipsan.levinson.Entities.Retrofit.Request.ConsignmentEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.CountingEpc
 import com.takipsan.levinson.Entities.Retrofit.Request.Login
+import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme
 import com.takipsan.levinson.Entities.Retrofit.Request.SayimEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.SevkiyatEpcGonderme_Kor
 import com.takipsan.levinson.Entities.Retrofit.Request.UrunArama
@@ -46,6 +47,15 @@ interface ApiService {
         @Body
         body:SayimEpcGonderme_Kor
     ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc>>>
+
+    @POST("counting/read")
+    suspend fun setCountingEpc(
+        @Header("Authorization")
+        authorizationHeader: String,
+        @Body
+        body: SayimEpcGonderme
+    ): Response<ApiResponseBase<List<com.takipsan.levinson.Entities.Retrofit.Response.CountingEpc>>>
+
 
     @POST("product/search")
     suspend fun getProduct(
